@@ -404,6 +404,16 @@ class DashboardPlugin(octoprint.plugin.SettingsPlugin,
         del self.layer_move_array[:]
         self.extruded_filament = 0.0
         self.extruded_filament_store = 0.0
+        self.max_x = ""
+        self.max_y = ""
+        self.max_z = ""
+        self.min_x = ""
+        self.min_y = ""
+        self.min_z = ""
+        self.depth = ""
+        self.height = ""
+        self.width = ""
+        self.estimated_print_time = ""
 
         metadata = self._file_manager.get_metadata(
             payload.get("origin"),
@@ -414,59 +424,69 @@ class DashboardPlugin(octoprint.plugin.SettingsPlugin,
             self.layer_move_array = json.loads(metadata['dashboard']['layer_move_array'])
             self.total_layers = len(self.layer_move_array)
             self.total_moves = sum(self.layer_move_array)
-        except KeyError:
+        except (KeyError, TypeError):
             pass
         try:
             self.filament_change_array = json.loads(metadata['dashboard']['filament_change_array'])
-        except KeyError:
+        except (KeyError, TypeError):
             pass
         try:
-            self.max_x = str(metadata['analysis']['printingArea']['maxX'])
-        except KeyError:
+            v = metadata['analysis']['printingArea']['maxX']
+            if v: self.max_x = str(v)
+        except (KeyError, TypeError):
             pass
         try:
-            self.max_y = str(metadata['analysis']['printingArea']['maxy'])
-        except KeyError:
+            v = metadata['analysis']['printingArea']['maxy']
+            if v: self.max_y = str(v)
+        except (KeyError, TypeError):
             pass
         try:
-            self.max_z = str(metadata['analysis']['printingArea']['maxZ'])
-        except KeyError:
+            v = metadata['analysis']['printingArea']['maxZ']
+            if v: self.max_z = str(v)
+        except (KeyError, TypeError):
             pass
         try:
-            self.min_x = str(metadata['analysis']['printingArea']['minX'])
-        except KeyError:
+            v = metadata['analysis']['printingArea']['minX']
+            if v: self.min_x = str(v)
+        except (KeyError, TypeError):
             pass
         try:
-            self.min_y = str(metadata['analysis']['printingArea']['minY'])
-        except KeyError:
+            v = metadata['analysis']['printingArea']['minY']
+            if v: self.min_y = str(v)
+        except (KeyError, TypeError):
             pass
         try:
-            self.min_z = str(metadata['analysis']['printingArea']['minZ'])
-        except KeyError:
+            v = metadata['analysis']['printingArea']['minZ']
+            if v: self.min_z = str(v)
+        except (KeyError, TypeError):
             pass
         try:
-            self.depth = str(metadata['analysis']['dimensions']['depth'])
-        except KeyError:
+            v = metadata['analysis']['dimensions']['depth']
+            if v: self.depth = str(v)
+        except (KeyError, TypeError):
             pass
         try:
-            self.height = str(metadata['analysis']['dimensions']['height'])
-        except KeyError:
+            v = metadata['analysis']['dimensions']['height']
+            if v: self.height = str(v)
+        except (KeyError, TypeError):
             pass
         try:
-            self.width = str(metadata['analysis']['dimensions']['width'])
-        except KeyError:
+            v = metadata['analysis']['dimensions']['width']
+            if v: self.width = str(v)
+        except (KeyError, TypeError):
             pass
         try:
-            self.estimated_print_time = str(metadata['analysis']['estimatedPrintTime'])
-        except KeyError:
+            v = metadata['analysis']['estimatedPrintTime']
+            if v: self.estimated_print_time = str(v)
+        except (KeyError, TypeError):
             pass
         try:
             self.average_print_time = str(metadata['statistics']['averagePrintTime'])
-        except KeyError:
+        except (KeyError, TypeError):
             pass
         try:
             self.last_print_time = str(metadata['statistics']['lastPrintTime'])
-        except KeyError:
+        except (KeyError, TypeError):
             pass
 
         if int(self.total_layers) > 0:
