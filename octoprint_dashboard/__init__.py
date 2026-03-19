@@ -556,6 +556,36 @@ class DashboardPlugin(octoprint.plugin.SettingsPlugin,
             if payload['path'] in self.gcode_preprocessors:
                 gcpp = self.gcode_preprocessors.pop(payload['path'])
                 self.unload_preprocesser(gcpp, payload)
+            # If analysis finished for the currently-printing file, update dimensions.
+            # This handles the common case where analysis completes after print start.
+            current_job = self._printer.get_current_job()
+            if (current_job and current_job.get("file", {}).get("path") == payload.get("path")
+                    and not self.height):
+                try:
+                    metadata = self._file_manager.get_metadata(
+                        payload.get("origin"), payload.get("path"))
+                    for key, attr, path in [
+                        ("height", "height", ["dimensions", "height"]),
+                        ("depth", "depth", ["dimensions", "depth"]),
+                        ("width", "width", ["dimensions", "width"]),
+                        ("max_z", "max_z", ["printingArea", "maxZ"]),
+                    ]:
+                        try:
+                            v = metadata["analysis"]
+                            for p in path:
+                                v = v[p]
+                            if v:
+                                setattr(self, attr, str(v))
+                        except (KeyError, TypeError):
+                            pass
+                    self._plugin_manager.send_plugin_message(self._identifier, dict(
+                        height=str(self.height),
+                        maxZ=str(self.max_z),
+                        depth=str(self.depth),
+                        width=str(self.width),
+                    ))
+                except Exception:
+                    pass
         elif event == Events.PRINT_STARTED:
             self.load_from_meta(payload)
         elif event == Events.PRINT_DONE or event == Events.PRINT_FAILED or event == Events.PRINT_CANCELLED:
