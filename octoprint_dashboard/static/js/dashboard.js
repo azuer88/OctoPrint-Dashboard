@@ -290,7 +290,7 @@ $(function () {
                     self.currentHeight(data.currentHeight);
 
                     if (self.totalHeight() > 0) {
-                        self.heightProgressString(self.currentHeight() / self.totalHeight() * 100);
+                        self.heightProgressString(Math.min(100, Math.max(0, self.currentHeight() / self.totalHeight() * 100)));
                         self.heightProgressBarString(Math.round(self.heightProgressString()) + '%');
                     }
                 }
